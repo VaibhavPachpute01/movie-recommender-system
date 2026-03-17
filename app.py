@@ -37,7 +37,7 @@ selected_movie_name = st.selectbox(
 # 🔽 Fetch Poster
 # -------------------------------
 def fetch_poster(movie_id):
-    api_key = os.getenv("TMDB_API_KEY")  # ✅ secure for deployment
+    api_key = os.getenv("e7ddfffcb2e0417700f203c8adbbe28c")  # ✅ secure for deployment
 
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}"
