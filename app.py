@@ -6,10 +6,8 @@ import time
 import os
 
 # -------------------------------
-# 🔽 Download simillarity.pkl from Google Drive
+# 🔽 Function to download file from Google Drive
 # -------------------------------
-import requests
-
 def download_file_from_google_drive(file_id, destination):
     URL = "https://drive.google.com/uc?export=download"
     
@@ -28,18 +26,26 @@ def download_file_from_google_drive(file_id, destination):
             if chunk:
                 f.write(chunk)
 
-# Download only if not exists
-import os
-if not os.path.exists("simillarity.pkl"):
-    download_file_from_google_drive(
-        "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR",
-        "simillarity.pkl"
-    )
+# -------------------------------
+# 🔽 Download similarity.pkl (ONLY if not exists)
+# -------------------------------
+file_id = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
+
+if not os.path.exists("similarity.pkl"):
+    download_file_from_google_drive(file_id, "similarity.pkl")
+
+# -------------------------------
+# 🔽 Safety check (prevent corruption)
+# -------------------------------
+if os.path.getsize("similarity.pkl") < 1000000:
+    st.error("❌ similarity.pkl not downloaded correctly. Please check file access.")
+    st.stop()
+
 # -------------------------------
 # 🔽 Load Data
 # -------------------------------
 movies_df = pickle.load(open('movies.pkl', 'rb'))
-simillarity = pickle.load(open('simillarity.pkl', 'rb'))  # ✅ fixed spelling
+similarity = pickle.load(open('similarity.pkl', 'rb'))
 
 # -------------------------------
 # 🔽 Streamlit UI
@@ -53,10 +59,10 @@ selected_movie_name = st.selectbox(
 )
 
 # -------------------------------
-# 🔽 Fetch Poster
+# 🔽 Fetch Poster from TMDB
 # -------------------------------
 def fetch_poster(movie_id):
-    api_key = os.getenv("TMDB_API_KEY")  # ✅ secure for deployment
+    api_key = os.getenv("TMDB_API_KEY")  # ✅ secure
 
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}"
@@ -81,7 +87,7 @@ def fetch_poster(movie_id):
 # -------------------------------
 def recommend(movie):
     movie_index = movies_df[movies_df['title'] == movie].index[0]
-    distances = simillarity[movie_index]
+    distances = similarity[movie_index]
 
     movie_list = sorted(
         list(enumerate(distances)),
@@ -96,7 +102,7 @@ def recommend(movie):
         movie_id = movies_df.iloc[i[0]].id
         recommended_movies.append(movies_df.iloc[i[0]].title)
         recommended_movies_poster.append(fetch_poster(movie_id))
-        time.sleep(0.2)  # ✅ prevents API blocking
+        time.sleep(0.2)  # ✅ avoid API blocking
 
     return recommended_movies, recommended_movies_poster
 
