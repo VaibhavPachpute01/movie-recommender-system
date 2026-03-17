@@ -9,20 +9,21 @@ import gdown  # ✅ important
 # -------------------------------
 # 🔽 Download similarity.pkl using gdown
 # -------------------------------
-import gdown
+import requests
 import os
 
-FILE_ID = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
+FILE_URL = "https://www.dropbox.com/scl/fi/yywfidgi0kxzbf92t5kf2/similarity.pkl?rlkey=nmqz9lajo93ko3pxuvcuk5569&dl=1"
 FILE_NAME = "similarity.pkl"
 
 if not os.path.exists(FILE_NAME):
-    url = f"https://drive.google.com/uc?id={FILE_ID}"
-    gdown.download(url, FILE_NAME, quiet=False)
+    with requests.get(FILE_URL, stream=True) as r:
+        with open(FILE_NAME, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
-# ✅ DEBUG PRINT
-if os.path.exists(FILE_NAME):
-    print("File downloaded, size:", os.path.getsize(FILE_NAME))
-
+# DEBUG
+print("File size:", os.path.getsize(FILE_NAME))
 # -------------------------------
 # 🔽 Safety check
 # -------------------------------
