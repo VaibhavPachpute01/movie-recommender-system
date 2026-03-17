@@ -4,42 +4,23 @@ import pandas as pd
 import requests
 import time
 import os
+import gdown  # ✅ important
 
 # -------------------------------
-# 🔽 Function to download file from Google Drive
+# 🔽 Download similarity.pkl using gdown
 # -------------------------------
-def download_file_from_google_drive(file_id, destination):
-    import gdown
+FILE_ID = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
+FILE_NAME = "similarity.pkl"
 
-if not os.path.exists("similarity.pkl"):
-    url = "https://drive.google.com/uc?id=1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
-    gdown.download(url, "similarity.pkl", quiet=False)
-
-    # Handle large file warning
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            params = {'id': file_id, 'confirm': value}
-            response = session.get(URL, params=params, stream=True)
-            break
-
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(32768):
-            if chunk:
-                f.write(chunk)
+if not os.path.exists(FILE_NAME):
+    url = f"https://drive.google.com/uc?id={FILE_ID}"
+    gdown.download(url, FILE_NAME, quiet=False)
 
 # -------------------------------
-# 🔽 Download similarity.pkl (ONLY if not exists)
+# 🔽 Safety check
 # -------------------------------
-file_id = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
-
-if not os.path.exists("similarity.pkl"):
-    download_file_from_google_drive(file_id, "similarity.pkl")
-
-# -------------------------------
-# 🔽 Safety check (prevent corruption)
-# -------------------------------
-if os.path.getsize("similarity.pkl") < 1000000:
-    st.error("❌ similarity.pkl not downloaded correctly. Please check file access.")
+if not os.path.exists(FILE_NAME) or os.path.getsize(FILE_NAME) < 1000000:
+    st.error("❌ similarity.pkl not downloaded properly.")
     st.stop()
 
 # -------------------------------
@@ -49,21 +30,20 @@ movies_df = pickle.load(open('movies.pkl', 'rb'))
 similarity = pickle.load(open('similarity.pkl', 'rb'))
 
 # -------------------------------
-# 🔽 Streamlit UI
+# 🔽 UI
 # -------------------------------
 st.title('🎬 Movie Recommender System')
 
-movie_titles = movies_df['title'].values
 selected_movie_name = st.selectbox(
     "Select a movie to get recommendations:",
-    movie_titles
+    movies_df['title'].values
 )
 
 # -------------------------------
-# 🔽 Fetch Poster from TMDB
+# 🔽 Fetch Poster
 # -------------------------------
 def fetch_poster(movie_id):
-    api_key = os.getenv("TMDB_API_KEY")  # ✅ secure
+    api_key = os.getenv("TMDB_API_KEY")
 
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}"
@@ -87,34 +67,33 @@ def fetch_poster(movie_id):
 # 🔽 Recommendation Logic
 # -------------------------------
 def recommend(movie):
-    movie_index = movies_df[movies_df['title'] == movie].index[0]
-    distances = similarity[movie_index]
+    index = movies_df[movies_df['title'] == movie].index[0]
+    distances = similarity[index]
 
-    movie_list = sorted(
+    movies_list = sorted(
         list(enumerate(distances)),
         reverse=True,
         key=lambda x: x[1]
     )[1:6]
 
-    recommended_movies = []
-    recommended_movies_poster = []
+    names = []
+    posters = []
 
-    for i in movie_list:
+    for i in movies_list:
         movie_id = movies_df.iloc[i[0]].id
-        recommended_movies.append(movies_df.iloc[i[0]].title)
-        recommended_movies_poster.append(fetch_poster(movie_id))
-        time.sleep(0.2)  # ✅ avoid API blocking
+        names.append(movies_df.iloc[i[0]].title)
+        posters.append(fetch_poster(movie_id))
+        time.sleep(0.2)
 
-    return recommended_movies, recommended_movies_poster
+    return names, posters
 
 # -------------------------------
-# 🔽 Button Action
+# 🔽 Button
 # -------------------------------
 if st.button("Recommend"):
     names, posters = recommend(selected_movie_name)
 
     cols = st.columns(5)
-
     for i in range(5):
         with cols[i]:
             st.text(names[i])
