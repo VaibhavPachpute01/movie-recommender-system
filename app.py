@@ -12,11 +12,19 @@ FILE_URL = "https://www.dropbox.com/scl/fi/yywfidgi0kxzbf92t5kf2/similarity.pkl?
 FILE_NAME = "similarity.pkl"
 
 if not os.path.exists(FILE_NAME):
-    with requests.get(FILE_URL, stream=True) as r:
-        with open(FILE_NAME, "wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
+    st.write("Downloading file...")  # 👈 DEBUG
+    response = requests.get(FILE_URL, stream=True)
+    
+    st.write("Status Code:", response.status_code)  # 👈 DEBUG
+    
+    with open(FILE_NAME, "wb") as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+
+# 👇 CHECK SIZE
+file_size = os.path.getsize(FILE_NAME)
+st.write("Downloaded file size:", file_size)
 
 # -------------------------------
 # 🔽 Safety check
