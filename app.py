@@ -30,7 +30,7 @@ def download_file_from_google_drive(file_id, destination):
 
 # Download only if not exists
 import os
-if not os.path.exists("similarity.pkl"):
+if not os.path.exists("simillarity.pkl"):
     download_file_from_google_drive(
         "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR",
         "similarity.pkl"
