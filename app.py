@@ -4,14 +4,10 @@ import pandas as pd
 import requests
 import time
 import os
-import gdown  # ✅ important
 
 # -------------------------------
-# 🔽 Download similarity.pkl using gdown
+# 🔽 Download similarity.pkl from Dropbox
 # -------------------------------
-import requests
-import os
-
 FILE_URL = "https://www.dropbox.com/scl/fi/yywfidgi0kxzbf92t5kf2/similarity.pkl?rlkey=nmqz9lajo93ko3pxuvcuk5569&dl=1"
 FILE_NAME = "similarity.pkl"
 
@@ -22,8 +18,6 @@ if not os.path.exists(FILE_NAME):
                 if chunk:
                     f.write(chunk)
 
-# DEBUG
-print("File size:", os.path.getsize(FILE_NAME))
 # -------------------------------
 # 🔽 Safety check
 # -------------------------------
