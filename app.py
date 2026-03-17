@@ -6,7 +6,7 @@ import time
 import os
 
 # -------------------------------
-# 🔽 Download similarity.pkl from Google Drive
+# 🔽 Download simillarity.pkl from Google Drive
 # -------------------------------
 import requests
 
@@ -33,13 +33,13 @@ import os
 if not os.path.exists("simillarity.pkl"):
     download_file_from_google_drive(
         "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR",
-        "similarity.pkl"
+        "simillarity.pkl"
     )
 # -------------------------------
 # 🔽 Load Data
 # -------------------------------
 movies_df = pickle.load(open('movies.pkl', 'rb'))
-similarity = pickle.load(open('similarity.pkl', 'rb'))  # ✅ fixed spelling
+simillarity = pickle.load(open('simillarity.pkl', 'rb'))  # ✅ fixed spelling
 
 # -------------------------------
 # 🔽 Streamlit UI
@@ -81,7 +81,7 @@ def fetch_poster(movie_id):
 # -------------------------------
 def recommend(movie):
     movie_index = movies_df[movies_df['title'] == movie].index[0]
-    distances = similarity[movie_index]
+    distances = simillarity[movie_index]
 
     movie_list = sorted(
         list(enumerate(distances)),
