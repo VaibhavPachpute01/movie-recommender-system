@@ -8,14 +8,33 @@ import os
 # -------------------------------
 # 🔽 Download similarity.pkl from Google Drive
 # -------------------------------
-file_id = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
-url = f"https://drive.google.com/uc?export=download&id={file_id}"
+import requests
 
+def download_file_from_google_drive(file_id, destination):
+    URL = "https://drive.google.com/uc?export=download"
+    
+    session = requests.Session()
+    response = session.get(URL, params={'id': file_id}, stream=True)
+
+    # Handle large file warning
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            params = {'id': file_id, 'confirm': value}
+            response = session.get(URL, params=params, stream=True)
+            break
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(32768):
+            if chunk:
+                f.write(chunk)
+
+# Download only if not exists
+import os
 if not os.path.exists("similarity.pkl"):
-    with open("similarity.pkl", "wb") as f:
-        response = requests.get(url)
-        f.write(response.content)
-
+    download_file_from_google_drive(
+        "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR",
+        "similarity.pkl"
+    )
 # -------------------------------
 # 🔽 Load Data
 # -------------------------------
@@ -37,7 +56,7 @@ selected_movie_name = st.selectbox(
 # 🔽 Fetch Poster
 # -------------------------------
 def fetch_poster(movie_id):
-    api_key = os.getenv("e7ddfffcb2e0417700f203c8adbbe28c")  # ✅ secure for deployment
+    api_key = os.getenv("TMDB_API_KEY")  # ✅ secure for deployment
 
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}"
