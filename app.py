@@ -9,12 +9,19 @@ import gdown  # ✅ important
 # -------------------------------
 # 🔽 Download similarity.pkl using gdown
 # -------------------------------
+import gdown
+import os
+
 FILE_ID = "1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
 FILE_NAME = "similarity.pkl"
 
 if not os.path.exists(FILE_NAME):
     url = f"https://drive.google.com/uc?id={FILE_ID}"
     gdown.download(url, FILE_NAME, quiet=False)
+
+# ✅ DEBUG PRINT
+if os.path.exists(FILE_NAME):
+    print("File downloaded, size:", os.path.getsize(FILE_NAME))
 
 # -------------------------------
 # 🔽 Safety check
