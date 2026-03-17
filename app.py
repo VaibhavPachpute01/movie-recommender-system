@@ -9,10 +9,11 @@ import os
 # 🔽 Function to download file from Google Drive
 # -------------------------------
 def download_file_from_google_drive(file_id, destination):
-    URL = "https://drive.google.com/uc?export=download"
-    
-    session = requests.Session()
-    response = session.get(URL, params={'id': file_id}, stream=True)
+    import gdown
+
+if not os.path.exists("similarity.pkl"):
+    url = "https://drive.google.com/uc?id=1IG-oBU25CIJkuOKVjfxgkqUgKeUC9qLR"
+    gdown.download(url, "similarity.pkl", quiet=False)
 
     # Handle large file warning
     for key, value in response.cookies.items():
